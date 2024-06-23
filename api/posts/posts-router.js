@@ -31,10 +31,11 @@ router.get("/:id", async (req,res) => {
 router.get("/:id/comments", async (req,res) => {
     try {
         const {id} = req.params
-        const data = await helpers.findPostComments(id)
-        if (!data) {
+        const post = await helpers.findById(id)
+        if (!post) {
             res.status(404).json({ message: "The post with the specified ID does not exist" })
         } else {
+            const data = await helpers.findPostComments(id)
             res.status(200).json(data)
         }
     } catch(error) {
@@ -68,9 +69,9 @@ router.put("/:id",async (req,res) => {
             if (!title || !contents) {
                 res.status(400).json({ message: "Please provide title and contents for the post" })
             } else {
-                const data = await helpers.update(id,{title, contents})
-                console.log(data);
-                res.status(200).json({id,title,contents})
+                await helpers.update(id,{title, contents})
+                const data = await helpers.findById(id)
+                res.status(200).json(data)
             }
         }
 
